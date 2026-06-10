@@ -110,6 +110,20 @@
   .mech .eq{font-family:var(--serif);background:#f1f5fa;border:1px solid var(--line);border-radius:8px;padding:7px 12px;display:inline-block;font-size:.95rem;color:var(--navy);margin:2px 0 2px}
   .mech .proc{font-size:.93rem;color:var(--muted);margin:6px 0 0;line-height:1.55}
 
+  details.report{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:24px;overflow:hidden}
+  details.report > summary{cursor:pointer;list-style:none;padding:18px 24px;font-family:var(--sans);font-weight:600;color:var(--navy);display:flex;align-items:center;gap:10px;font-size:1rem}
+  details.report > summary::-webkit-details-marker{display:none}
+  details.report > summary::before{content:"▸";color:var(--green);font-size:.95rem;transition:transform .15s}
+  details.report[open] > summary::before{transform:rotate(90deg)}
+  details.report > summary:hover{background:var(--bg)}
+  .report-body{padding:6px 26px 26px;border-top:1px solid var(--line)}
+  .report-body h3{font-family:var(--serif);color:var(--navy);font-size:1.16rem;margin:22px 0 8px}
+  .report-body p{color:var(--ink);font-size:.95rem;margin:0 0 12px;line-height:1.62}
+  .report-body ul{margin:0 0 12px;padding-left:18px;color:var(--ink);font-size:.95rem}
+  .report-body li{margin-bottom:7px;line-height:1.55}
+  .report-rec{background:var(--green-soft);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-top:18px}
+  .report-rec p{margin:0;font-size:.96rem}
+
   @media(max-width:760px){
     .two,.findings,.cards,.figrow{grid-template-columns:1fr}
     .hero h1{font-size:1.9rem}
@@ -456,6 +470,93 @@
         <div class="go">GitHub →</div>
       </a>
     </div>
+  </div>
+</section>
+
+<!-- CONCLUSIONS + REPORT -->
+<section style="background:var(--bg)">
+  <div class="wrap">
+    <p class="eyebrow" data-lang-es>Conclusiones</p>
+    <p class="eyebrow" data-lang-en>Conclusions</p>
+    <h2 data-lang-es>Conclusiones previas y recomendación</h2>
+    <h2 data-lang-en>Preliminary conclusions and recommendation</h2>
+    <p class="sub" data-lang-es>De la comparación simulada se desprende un resultado robusto: bajo condiciones plausibles, el derecho residual tokenizado <strong>Pareto-domina</strong> al impuesto pigouviano — y los refinamientos de diseño (liquidación a fin de ejercicio, periodo de tenencia y deducibilidad fiscal) ensanchan aún más el margen de acuerdo.</p>
+    <p class="sub" data-lang-en>The simulated comparison yields a robust result: under plausible conditions, the tokenized residual right <strong>Pareto-dominates</strong> the Pigouvian tax — and the design refinements (year-end settlement, holding period and tax deductibility) widen the room for agreement even further.</p>
+
+    <ul class="varlist" style="max-width:66ch" data-lang-es>
+      <li><b>Trabajador:</b> es el único mecanismo que le devuelve valor directamente (θ·V); con devengo acumulativo llega al despido con la wallet llena — un segundo pilar cuasi-previsional.</li>
+      <li><b>Estado y contribuyente:</b> hasta un 26–39% más barato al eliminar el peso muerto fiscal (a netear con el escudo fiscal del Impuesto sobre Sociedades — ver informe).</li>
+      <li><b>Empresa:</b> paga más en valor presente (es un seguro, no un regalo), pero lo prefiere dentro de la zona de contratación con el impuesto como amenaza creíble; deducibilidad y financiación interna rebajan su coste neto ~30%.</li>
+    </ul>
+    <ul class="varlist" style="max-width:66ch" data-lang-en>
+      <li><b>Worker:</b> the only mechanism that returns value directly (θ·V); with cumulative accrual the worker reaches layoff with a full wallet — a quasi-pension second pillar.</li>
+      <li><b>State and taxpayer:</b> up to 26–39% cheaper by eliminating fiscal deadweight (to be netted against the corporate-tax shield — see report).</li>
+      <li><b>Firm:</b> pays more in present value (insurance, not a gift), but prefers it inside the contracting zone with the tax as a credible threat; deductibility and internal financing cut its net cost by ~30%.</li>
+    </ul>
+
+    <details class="report">
+      <summary><span data-lang-es>📄 Leer el informe completo y la recomendación final</span><span data-lang-en>📄 Read the full report and final recommendation</span></summary>
+      <div class="report-body">
+        <div data-lang-es>
+          <h3>1. El problema</h3>
+          <p>Falk y Tsoukalas (2026) prueban que la automatización competitiva por IA genera una externalidad de demanda agregada que ningún mecanismo voluntario corrige; solo un impuesto pigouviano la internaliza. Pero su Corolario 2 admite una grieta: si el trabajador recupera la renta desplazada (η→1), la sobreautomatización se corrige <em>sin</em> impuesto. El defecto de fondo es contractual — el contrato industrial trata el capital intelectual como input que se extingue, cuando bajo IA agéntica se convierte en activo que sigue generando valor tras la salida del trabajador. Casos como el despido de McKinsey (diciembre de 2025, ~5.000 puestos) muestran que el fenómeno ya alcanza a los servicios profesionales cualificados.</p>
+          <h3>2. Los dos mecanismos</h3>
+          <p>El <strong>impuesto pigouviano</strong> grava el ahorro de la automatización (τ); el Estado recauda y, en su caso, compensa; rompe en el momento del despido y no devuelve nada directamente al trabajador. El <strong>royalty tokenizado</strong> reconoce al trabajador un derecho θ sobre el valor V = κ·wᴵ que su conocimiento sigue generando, financiado por la empresa, devengado por cosechas anuales y custodiado en una wallet con garantía de insolvencia.</p>
+          <h3>3. Por qué la regalía domina, por parte</h3>
+          <ul>
+            <li><b>Trabajador:</b> recupera renta directamente (empuja η→1); con devengo acumulativo y pro-rata, llega al despido con el derecho ya devengado, e indexado al IPC.</li>
+            <li><b>Estado y contribuyente:</b> con afectación íntegra, cuesta 26–39% menos en los nueve países, porque elimina el peso muerto del canal fiscal y traslada la financiación al sector privado.</li>
+            <li><b>Empresa:</b> en valor presente paga más (paga antes = seguro), pero lo prefiere dentro de la zona de contratación —[3,7%–5,0%] a τ=20%— porque el impuesto legislado es la amenaza creíble (punto de desacuerdo de Nash) y la financiación interna le recupera ~16%.</li>
+          </ul>
+          <h3>4. Refinamientos de diseño analizados</h3>
+          <ul>
+            <li><b>Liquidación a 31/12:</b> retrasa el flujo (acerca el perfil al del impuesto y baja el coste en VP de la empresa) y lo hace <strong>deducible en el Impuesto sobre Sociedades</strong> en el ejercicio — un escudo fiscal de ~t_c (≈25% en España) que reduce el coste neto de la empresa otro ~30%, pero que el Estado co-financia con menor recaudación de Sociedades.</li>
+            <li><b>Periodo de tenencia de 1 año:</b> refuerza la financiación interna (capital paciente) y preserva el autoseguro del trabajador → ambas fronteras se mueven a favor y la zona de contratación se ensancha. Coste: liquidez del trabajador durante un año.</li>
+            <li><b>Devengo pro-rata:</b> 6/12 si el despido es en junio → no hay "cliff" ni incentivo a adelantar el despido; la permanencia condicionada es automática.</li>
+          </ul>
+          <h3>5. Condiciones y límites</h3>
+          <ul>
+            <li>No son alternativas excluyentes: la regalía necesita el impuesto como régimen subsidiario creíble.</li>
+            <li>Óptimo híbrido por cohorte: impuesto para los jóvenes (transición), regalía para los seniors (cristalización); cruce en 48–52 años.</li>
+            <li>La garantía de insolvencia (fondo tipo FOGASA o segregación) es condición, no opción — más aún con tenencia mínima de 1 año.</li>
+            <li>El efecto fiscal neto depende de si el impuesto es también deducible: si no lo es, la regalía gana margen de adopción a costa del erario.</li>
+            <li>Brecha de pensiones: el despido a 55 erosiona ~20% de la base reguladora (≈90.000 €) que ningún mecanismo repara; extensión natural: convenio especial con la Seguridad Social desde la wallet.</li>
+          </ul>
+          <div class="report-rec">
+            <p><strong>Recomendación final.</strong> Adoptar un sistema de <strong>dos pisos</strong>: el impuesto pigouviano como régimen subsidiario legislado —la amenaza creíble que abre la negociación— y el derecho residual tokenizado, de devengo acumulativo y pro-rata, como régimen negociable dentro de la zona de contratación. Liquidación a fin de ejercicio (deducible), periodo mínimo de tenencia de un año, garantía de insolvencia obligatoria y un tramo mínimo del 5% como suelo de participación. Asignar el peso fiscal a las cohortes jóvenes y el contractual a las seniors. Y legislar de forma explícita el tratamiento fiscal del impuesto y de la deducción, porque de ahí depende el signo del resultado para el contribuyente.</p>
+          </div>
+        </div>
+        <div data-lang-en>
+          <h3>1. The problem</h3>
+          <p>Falk and Tsoukalas (2026) prove that competitive AI-driven automation generates an aggregate-demand externality that no voluntary mechanism corrects; only a Pigouvian tax internalizes it. Yet their Corollary 2 admits a crack: if the worker recovers the displaced income (η→1), over-automation is corrected <em>without</em> a tax. The underlying flaw is contractual — the industrial contract treats intellectual capital as an input that expires, whereas under agentic AI it becomes an asset that keeps generating value after the worker leaves. Cases such as McKinsey's layoff (December 2025, ~5,000 roles) show the phenomenon already reaches skilled professional services.</p>
+          <h3>2. The two mechanisms</h3>
+          <p>The <strong>Pigouvian tax</strong> levies the automation saving (τ); the State collects and, where applicable, compensates; it breaks at the moment of layoff and returns nothing directly to the worker. The <strong>tokenized royalty</strong> grants the worker a claim θ on the value V = κ·wᴵ their knowledge keeps generating, financed by the firm, accrued by annual vintages and held in an insolvency-guaranteed wallet.</p>
+          <h3>3. Why the royalty dominates, by party</h3>
+          <ul>
+            <li><b>Worker:</b> recovers income directly (pushes η→1); with cumulative, pro-rata accrual, reaches layoff with the claim already vested and CPI-indexed.</li>
+            <li><b>State and taxpayer:</b> under full earmarking, 26–39% cheaper across the nine countries, because it eliminates the fiscal-channel deadweight and shifts financing to the private sector.</li>
+            <li><b>Firm:</b> pays more in present value (pays earlier = insurance), but prefers it inside the contracting zone —[3.7%–5.0%] at τ=20%— because the legislated tax is the credible threat (Nash disagreement point) and internal financing recovers ~16%.</li>
+          </ul>
+          <h3>4. Design refinements analyzed</h3>
+          <ul>
+            <li><b>Year-end settlement (31/12):</b> delays the flow (moving its profile toward the tax and lowering the firm's PV cost) and makes it <strong>deductible against corporate income tax</strong> within the year — a tax shield of ~t_c (≈25% in Spain) that cuts the firm's net cost by a further ~30%, but which the State co-finances through lower corporate-tax revenue.</li>
+            <li><b>1-year holding period:</b> strengthens internal financing (patient capital) and preserves the worker's self-insurance → both frontiers move favorably and the contracting zone widens. Cost: the worker's liquidity for one year.</li>
+            <li><b>Pro-rata accrual:</b> 6/12 if the layoff is in June → no "cliff" and no incentive to bring the layoff forward; conditional tenure is automatic.</li>
+          </ul>
+          <h3>5. Conditions and limits</h3>
+          <ul>
+            <li>They are not mutually exclusive: the royalty needs the tax as a credible backstop regime.</li>
+            <li>Hybrid optimum by cohort: tax for the young (transition), royalty for seniors (crystallization); crossover at ages 48–52.</li>
+            <li>The insolvency guarantee (FOGASA-type fund or segregation) is a condition, not an option — all the more with a 1-year minimum holding period.</li>
+            <li>The net fiscal effect depends on whether the tax is also deductible: if it is not, the royalty gains adoption room at the Treasury's expense.</li>
+            <li>Pension gap: displacement at 55 erodes ~20% of the pension base (≈€90,000) that no mechanism repairs; natural extension: a special social-security agreement funded from the wallet.</li>
+          </ul>
+          <div class="report-rec">
+            <p><strong>Final recommendation.</strong> Adopt a <strong>two-tier</strong> system: the Pigouvian tax as a legislated backstop regime —the credible threat that opens the negotiation— and the tokenized residual right, with cumulative pro-rata accrual, as the negotiable regime within the contracting zone. Year-end settlement (deductible), a one-year minimum holding period, a mandatory insolvency guarantee and a 5% minimum band as participation floor. Assign the fiscal weight to young cohorts and the contractual weight to seniors. And legislate the tax treatment of both the tax and the deduction explicitly, because the sign of the result for the taxpayer depends on it.</p>
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>
 
