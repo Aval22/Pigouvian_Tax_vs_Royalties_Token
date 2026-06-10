@@ -2,7 +2,7 @@
 
 **🇪🇸** Simulador comparado: impuesto pigouviano a la automatización vs. royalties tokenizados por transferencia de capital intelectual (Marco ITEA · Paper 8B). **🇬🇧** Comparative simulator: Pigouvian automation tax vs. tokenized intellectual-capital royalties (ITEA Framework · Paper 8B).
 
-**🔗 Dashboard (GitHub Pages):** https://Aval22.github.io/pigouvian-tax-vs-royalties-token/
+**🔗 Dashboard (GitHub Pages):** https://aval22.github.io/Pigouvian_TAX_vs_Royalties_token/
 
 | | |
 |---|---|
