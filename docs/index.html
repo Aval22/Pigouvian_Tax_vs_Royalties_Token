@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ITEA Simulator · Pigouvian Tax vs Royalties Token</title>
+<meta name="description" content="Interactive simulator: Pigouvian robot tax vs intellectual-capital royalty tokens (ITEA Framework, Paper 8B)."/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+const { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip: RTooltip, Legend, ReferenceLine, ResponsiveContainer, CartesianGrid } = Recharts;
+
+
+
+
+/* ============================================================
+   SIMULADOR ITEA — Impuesto pigouviano vs. Royalties por transferencia de CI
+   Marco: Paper 8B (García-Lluis Valencia) · Calibración Forbes Global 2000
+   ============================================================ */
+
+// ---------------- países (aprox. fiscal 2026, moneda local) ----------------
+const COUNTRIES = {
+  ES: { name:{es:"España",en:"Spain"}, cur:"€", erSSC:0.31, eeSSC:{rate:0.0647,cap:60000}, capTax:0.21, consTax:0.10,
+        brackets:[[12450,.19],[20200,.24],[35200,.30],[60000,.37],[300000,.45],[1e12,.47]], allow:5550,
+        unCapY:18900, assist:5760, taxpayersM:22, wageIdx:1.00 },
+  FR: { name:{es:"Francia",en:"France"}, cur:"€", erSSC:0.42, eeSSC:{rate:0.115,cap:1e12}, capTax:0.30, consTax:0.11,
+        brackets:[[11294,0],[28797,.11],[82341,.30],[177106,.41],[1e12,.45]], allow:0,
+        unCapY:21000, assist:6300, taxpayersM:26, wageIdx:1.15 },
+  DE: { name:{es:"Alemania",en:"Germany"}, cur:"€", erSSC:0.207, eeSSC:{rate:0.205,cap:90600}, capTax:0.26, consTax:0.10,
+        brackets:[[11604,0],[17005,.20],[66760,.32],[277825,.42],[1e12,.45]], allow:0,
+        unCapY:24000, assist:6700, taxpayersM:33, wageIdx:1.30 },
+  IT: { name:{es:"Italia",en:"Italy"}, cur:"€", erSSC:0.30, eeSSC:{rate:0.0919,cap:122295}, capTax:0.26, consTax:0.11,
+        brackets:[[28000,.23],[50000,.35],[1e12,.43]], allow:1880,
+        unCapY:17000, assist:6000, taxpayersM:25, wageIdx:0.95 },
+  BE: { name:{es:"Bélgica",en:"Belgium"}, cur:"€", erSSC:0.27, eeSSC:{rate:0.1307,cap:1e12}, capTax:0.30, consTax:0.11,
+        brackets:[[15820,.25],[27920,.40],[48320,.45],[1e12,.50]], allow:10570,
+        unCapY:23000, assist:7800, taxpayersM:5, wageIdx:1.25 },
+  PT: { name:{es:"Portugal",en:"Portugal"}, cur:"€", erSSC:0.2375, eeSSC:{rate:0.11,cap:1e12}, capTax:0.28, consTax:0.11,
+        brackets:[[7703,.1325],[11623,.18],[16472,.23],[21321,.26],[27146,.3275],[39791,.37],[51997,.435],[81199,.45],[1e12,.48]], allow:4104,
+        unCapY:15400, assist:6200, taxpayersM:5.5, wageIdx:0.65 },
+  UK: { name:{es:"Reino Unido",en:"United Kingdom"}, cur:"£", erSSC:0.15, eeSSC:{rate:0.08,cap:50270}, capTax:0.20, consTax:0.10,
+        brackets:[[12570,0],[50270,.20],[125140,.40],[1e12,.45]], allow:0,
+        unCapY:5800, assist:4700, taxpayersM:34, wageIdx:1.05 },
+  US: { name:{es:"EE. UU.",en:"United States"}, cur:"$", erSSC:0.095, eeSSC:{rate:0.0765,cap:176100}, capTax:0.18, consTax:0.07,
+        brackets:[[11600,.10],[47150,.12],[100525,.22],[191950,.24],[243725,.32],[1e12,.37]], allow:14600,
+        unCapY:26000, assist:0, taxpayersM:130, wageIdx:1.55 },
+  CA: { name:{es:"Canadá",en:"Canada"}, cur:"C$", erSSC:0.077, eeSSC:{rate:0.0695,cap:68500}, capTax:0.22, consTax:0.09,
+        brackets:[[55867,.225],[111733,.305],[173205,.36],[1e12,.43]], allow:15705,
+        unCapY:33500, assist:9000, taxpayersM:21, wageIdx:1.30 },
+};
+
+// ---------------- ocupaciones O*NET con percentil ITEA (editable) ----------------
+const OCC = [
+  { soc:"13-2082", en:"Tax Preparers", es:"Preparadores fiscales", itea:98, sector:"finServ", sal:42000 },
+  { soc:"13-2053", en:"Insurance Underwriters", es:"Suscriptores de seguros", itea:97, sector:"insur", sal:58000 },
+  { soc:"13-2041", en:"Credit Analysts", es:"Analistas de crédito", itea:96, sector:"bank", sal:62000 },
+  { soc:"13-2051", en:"Financial & Investment Analysts", es:"Analistas financieros", itea:94, sector:"bank", sal:77500 },
+  { soc:"13-2011", en:"Accountants & Auditors", es:"Contables y auditores", itea:93, sector:"profServ", sal:52000 },
+  { soc:"15-2011", en:"Actuaries", es:"Actuarios", itea:92, sector:"insur", sal:85000 },
+  { soc:"23-2011", en:"Paralegals & Legal Assistants", es:"Paralegales", itea:91, sector:"profServ", sal:40000 },
+  { soc:"27-3042", en:"Technical Writers", es:"Redactores técnicos", itea:90, sector:"media", sal:48000 },
+  { soc:"13-1161", en:"Market Research Analysts", es:"Analistas de mercado", itea:89, sector:"profServ", sal:55000 },
+  { soc:"15-2051", en:"Data Scientists", es:"Científicos de datos", itea:88, sector:"it", sal:70000 },
+  { soc:"15-1252", en:"Software Developers", es:"Desarrolladores de software", itea:85, sector:"it", sal:60000 },
+  { soc:"43-4051", en:"Customer Service Representatives", es:"Atención al cliente", itea:82, sector:"retail", sal:28000 },
+  { soc:"13-1071", en:"HR Specialists", es:"Especialistas de RR. HH.", itea:78, sector:"profServ", sal:42000 },
+  { soc:"13-1081", en:"Logisticians", es:"Logísticos", itea:75, sector:"transp", sal:46000 },
+  { soc:"17-2141", en:"Mechanical Engineers", es:"Ingenieros mecánicos", itea:72, sector:"manuf", sal:60000 },
+  { soc:"29-1141", en:"Registered Nurses", es:"Enfermería", itea:35, sector:"health", sal:38000 },
+  { soc:"47-2111", en:"Electricians", es:"Electricistas", itea:28, sector:"constr", sal:34000 },
+];
+const SECTORS = {
+  bank:{es:"Banca y finanzas",en:"Banking & finance",k:2.2,nEf:7.7,dec:0.12},
+  insur:{es:"Seguros",en:"Insurance",k:1.8,nEf:12,dec:0.12},
+  finServ:{es:"Servicios financieros",en:"Financial services",k:2.0,nEf:10,dec:0.12},
+  it:{es:"TI: software y servicios",en:"IT: software & services",k:1.8,nEf:7.8,dec:0.18},
+  profServ:{es:"Servicios profesionales",en:"Professional services",k:1.5,nEf:18,dec:0.15},
+  media:{es:"Media",en:"Media",k:1.7,nEf:8.9,dec:0.18},
+  retail:{es:"Comercio",en:"Retail",k:1.3,nEf:29,dec:0.15},
+  transp:{es:"Transporte y logística",en:"Transport & logistics",k:1.5,nEf:24,dec:0.15},
+  manuf:{es:"Industria",en:"Manufacturing",k:1.6,nEf:40,dec:0.12},
+  health:{es:"Salud",en:"Healthcare",k:1.4,nEf:8,dec:0.10},
+  constr:{es:"Construcción",en:"Construction",k:1.4,nEf:31,dec:0.10},
+};
+
+// ---------------- i18n ----------------
+const T = {
+  es: {
+    title:"Simulador ITEA", subtitle:"Impuesto pigouviano vs. royalties por transferencia de capital intelectual",
+    cfg:"Configuración del caso", country:"País", occ:"Ocupación (Title O*NET)", gross:"Salario bruto anual",
+    exposed:"Trabajadores expuestos (país)", pigou:"Sistema A · Impuesto pigouviano", roy:"Sistema B · Royalties ITEA",
+    results:"Veredicto por actor", charts:"Progresión temporal", interp:"Interpretación de resultados",
+    worker:"Trabajador", firm:"Empresa", state:"Estado", taxpayer:"Contribuyente",
+    netSalary:"Neto anual", payments:"pagas", withheld:"Retenciones", ssc:"Cotización trabajador",
+    better:"Mejor sistema", margin:"margen", tie:"Empate técnico",
+    incomeChart:"Renta neta disponible (edad 35→65)", walletChart:"Saldo de la wallet de CI",
+    stateChart:"Saldo fiscal acumulado vs. continuidad", npvChart:"VAN a 10 años por actor (55→65)",
+    continuity:"Continuidad", pigouS:"Pigouviano", royS:"Royalties",
+    derived:"Indicadores derivados", thetaMin:"θ mínimo de retención (ec. 8)", thetaEta:"θ para recuperación plena neta (η=1)",
+    particip:"Condición de participación vs. impuesto", fImpl:"Externalidad f implícita", overcomp:"Sobrecompensación (η>1): riesgo de subautomatización",
+    ok:"se cumple", ko:"no se cumple", perTaxpayerYr:"por contribuyente y año", eta:"Tasa de recuperación de renta η",
+    age:"Edad", year:"Año", dismissal:"despido (55)", itea_pct:"Percentil ITEA", outOfScope:"Percentil < 50: fuera del ámbito de θ (tramo no cubierto)",
+    advanced:"Parámetros avanzados", reset:"Restaurar valores",
+    vars:{
+      tau:["Tipo pigouviano τ","% del coste laboral ahorrado por automatizar que la empresa paga como impuesto. Zona de literatura: 10–30%."],
+      inef:["Ineficiencia del canal fiscal","Fracción de la recaudación que se pierde en administración y peso muerto antes de llegar al trabajador (Card-Kluve-Weber; coste marginal de fondos públicos)."],
+      alpha:["Afectación de la recaudación","Parte de lo recaudado que se destina realmente a compensar a los desplazados (el resto va a caja general)."],
+      dur:["Duración de la transferencia","Años durante los que el desplazado cobra la compensación pigouviana."],
+      ttr:["Fiscalidad de la transferencia","Tipo medio que tributa la compensación (0 = exenta; 1 = como salario pleno)."],
+      nEf:["N efectivo del sector","Número equivalente de competidores (1/HHI, calibrado con Forbes G2000). Con pocas firmas, cada una internaliza más daño y el impuesto óptimo baja: τ* = f·(1−1/N)."],
+      theta:["Derecho residual θ","% del flujo del activo algorítmico (V) que se paga al trabajador como royalty por la transferencia de su capital intelectual."],
+      kappa:["Multiplicador κ_V","Valor del activo algorítmico como múltiplo del coste laboral total (V = κ·wᴵ). Calibrado por sector con beneficio/empleado del Forbes Global 2000."],
+      arch:["Arquitectura","Plana: el royalty solo se paga tras el despido. Acumulativa: cada año de trabajo genera derechos (vintages) que decaen y se acumulan en la wallet."],
+      dec:["Decaimiento del vintage δ","Pérdida anual de valor de los derechos de cada proyecto (15% ≈ vida media de 6,7 años)."],
+      career:["Años de carrera acumulada","Años de transferencia de CI antes del despido (rampa hacia el flujo estacionario θ·V)."],
+      wIPC:["Wallet: depósito IPC","% del saldo en depósito indexado al IPC (rendimiento real 0%). Sin riesgo de mercado."],
+      wInt:["Wallet: financiación interna","% del saldo prestado a proyectos de la empresa como producto financiero interno, remunerado IPC + spread."],
+      spread:["Spread de financiación interna","Prima real anual sobre IPC que paga la empresa por usar la wallet como financiación (entre su coste de deuda y el depósito)."],
+      wOut:["Wallet: retirada anual","% del devengo anual que el trabajador rescata y consume durante la carrera (erosiona el autoseguro)."],
+      capTax:["Fiscalidad del royalty","Tributa como renta del ahorro/capital del país (tipo mostrado) en el devengo."],
+      haz:["Probabilidad anual de recolocación","Hazard de reempleo tras el despido (>55 años)."],
+      pen:["Penalización salarial","Pérdida de salario media al recolocarse."],
+      r:["Tasa de descuento real","Para los valores actuales netos."],
+    },
+  },
+  en: {
+    title:"ITEA Simulator", subtitle:"Pigouvian tax vs. royalties for intellectual-capital transfer",
+    cfg:"Case configuration", country:"Country", occ:"Occupation (O*NET Title)", gross:"Annual gross salary",
+    exposed:"Exposed workers (country)", pigou:"System A · Pigouvian tax", roy:"System B · ITEA royalties",
+    results:"Verdict by stakeholder", charts:"Time progression", interp:"Interpretation of results",
+    worker:"Worker", firm:"Firm", state:"State", taxpayer:"Taxpayer",
+    netSalary:"Annual net", payments:"payments", withheld:"Income tax withheld", ssc:"Employee social security",
+    better:"Better system", margin:"margin", tie:"Statistical tie",
+    incomeChart:"Net disposable income (age 35→65)", walletChart:"IC wallet balance",
+    stateChart:"Cumulative fiscal balance vs. continuity", npvChart:"10-year NPV by stakeholder (55→65)",
+    continuity:"Continuity", pigouS:"Pigouvian", royS:"Royalties",
+    derived:"Derived indicators", thetaMin:"Minimum retention θ (eq. 8)", thetaEta:"θ for full net recovery (η=1)",
+    particip:"Participation condition vs. tax", fImpl:"Implied externality f", overcomp:"Overcompensation (η>1): under-automation risk",
+    ok:"holds", ko:"does not hold", perTaxpayerYr:"per taxpayer per year", eta:"Income recovery rate η",
+    age:"Age", year:"Year", dismissal:"dismissal (55)", itea_pct:"ITEA percentile", outOfScope:"Percentile < 50: outside θ coverage",
+    advanced:"Advanced parameters", reset:"Reset defaults",
+    vars:{
+      tau:["Pigouvian rate τ","% of labour cost saved by automating that the firm pays as tax. Literature zone: 10–30%."],
+      inef:["Fiscal channel inefficiency","Share of revenue lost to administration and deadweight before reaching the worker (Card-Kluve-Weber; marginal cost of public funds)."],
+      alpha:["Revenue earmarking","Share of revenue actually used to compensate displaced workers (the rest goes to the general budget)."],
+      dur:["Transfer duration","Years the displaced worker receives the Pigouvian compensation."],
+      ttr:["Transfer taxation","Average rate at which the compensation is taxed (0 = exempt; 1 = as full salary)."],
+      nEf:["Effective N of the sector","Equivalent number of competitors (1/HHI, calibrated on Forbes G2000). With few firms each internalises more damage and the optimal tax falls: τ* = f·(1−1/N)."],
+      theta:["Residual right θ","% of the algorithmic asset flow (V) paid to the worker as a royalty for the transfer of their intellectual capital."],
+      kappa:["Multiplier κ_V","Algorithmic asset value as a multiple of total labour cost (V = κ·wᴵ). Calibrated by sector with Forbes Global 2000 profit per employee."],
+      arch:["Architecture","Flat: royalty paid only after dismissal. Cumulative: each year worked generates vintage rights that decay and accrue to the wallet."],
+      dec:["Vintage decay δ","Annual loss of value of each project's rights (15% ≈ 6.7-year half-life)."],
+      career:["Accumulated career years","Years of IC transfer before dismissal (ramp towards the steady flow θ·V)."],
+      wIPC:["Wallet: CPI deposit","% of the balance in a CPI-indexed deposit (0% real return). No market risk."],
+      wInt:["Wallet: internal financing","% of the balance lent to company projects as an internal financial product, paid CPI + spread."],
+      spread:["Internal financing spread","Real annual premium over CPI the firm pays for using the wallet as captive funding."],
+      wOut:["Wallet: annual withdrawal","% of each year's accrual the worker cashes out during the career (erodes self-insurance)."],
+      capTax:["Royalty taxation","Taxed as the country's savings/capital income (rate shown) on accrual."],
+      haz:["Annual re-employment probability","Re-employment hazard after dismissal (55+)."],
+      pen:["Wage penalty","Average wage loss upon re-employment."],
+      r:["Real discount rate","For net present values."],
+    },
+  },
+};
+
+// ---------------- motor fiscal ----------------
+function incomeTax(gross, c) {
+  let base = Math.max(0, gross - (c.allow||0)); let tax = 0, prev = 0;
+  for (const [lim, rate] of c.brackets) { if (base > prev) { tax += (Math.min(base, lim) - prev) * rate; prev = lim; } else break; }
+  return tax;
+}
+function netOf(gross, c) {
+  const ssc = c.eeSSC.rate * Math.min(gross, c.eeSSC.cap);
+  const it = incomeTax(gross - ssc, c);
+  return { net: gross - ssc - it, ssc, it };
+}
+const npv = (arr, r) => arr.reduce((s, v, i) => s + v / Math.pow(1 + r, i + 1), 0);
+const fmt = (v, cur) => (v >= 0 ? "" : "−") + cur + Math.abs(Math.round(v)).toLocaleString("en-US");
+
+// ---------------- simulación ----------------
+function simulate(p) {
+  const c = COUNTRIES[p.country];
+  const gross = p.gross, base = netOf(gross, c);
+  const wI = gross + c.erSSC * Math.min(gross, p.country==="ES"?60000:1e12 ) ;
+  const V = p.kappa * wI;
+  const careerY = p.career, postY = 10, r = p.r;
+  const FKr = (1.8 + 0.5) * gross * r; // costes despido+cristalización amortizados
+  const thetaMin = Math.max(0, (wI - FKr) / V);
+
+  // trayectoria de desempleo esperada (post-despido, sin compensación)
+  const reGross = gross * (1 - p.pen), reNet = netOf(reGross, c).net;
+  const un = [];
+  for (let t = 1; t <= postY; t++) {
+    const sEmp = 1 - Math.pow(1 - p.haz, t);
+    const ben = t <= 2 ? Math.min(0.65 * gross, c.unCapY) : c.assist;
+    const benNet = t <= 2 ? ben - incomeTax(ben, c) : ben;
+    un.push({ sEmp, net: sEmp * reNet + (1 - sEmp) * benNet,
+      tax: sEmp * (netOf(reGross, c).it + netOf(reGross, c).ssc + c.erSSC * reGross) + (1 - sEmp) * (t<=2? incomeTax(ben,c):0),
+      paid: (1 - sEmp) * ben });
+  }
+  const eta0 = un.reduce((s,u)=>s+u.net,0)/postY/base.net;
+
+  // ----- series por edad 36..65 -----
+  const ages = []; for (let a = 56 - careerY; a <= 65; a++) ages.push(a);
+  const cont = [], pig = [], roy = [], wal = [], dSt2 = [], dSt3 = [];
+  // pigouviano
+  const recauda = p.tau * wI, transfer = recauda * (1 - p.inef) * p.alpha;
+  const trNet = transfer * (1 - p.ttr);
+  // royalties acumulativo / plano
+  const thetaV = p.theta * V;
+  const wd = p.wOut, wIPCsh = p.wIPC * (1 - wd), wIntSh = (1 - p.wIPC) * (1 - wd);
+  const rWal = wIPCsh/(wIPCsh+wIntSh||1) * 0 + wIntSh/(wIPCsh+wIntSh||1) * p.spread;
+  let W = 0; const walSeries = [];
+  const accr = (s) => p.arch === "cum" ? thetaV * (1 - Math.pow(1 - p.dec, s)) : 0;
+  // bucle carrera
+  let stCum2 = 0, stCum3 = 0;
+  const firm2 = [], firm3 = [], st2 = [], st3 = [], w2 = [], w3 = [];
+  for (let s = 1; s <= careerY; s++) {
+    const g = accr(s), gNet = g * (1 - c.capTax);
+    const cash = gNet * wd; W = W * (1 + rWal) + gNet * (1 - wd);
+    const inc3 = base.net + cash;
+    cont.push(base.net); pig.push(base.net); roy.push(inc3); wal.push(W);
+    const stBase = base.it + base.ssc + c.erSSC * gross + c.consTax * 0.85 * base.net;
+    const st3y = stBase + g * c.capTax + c.consTax * 0.85 * cash;
+    st2.push(stBase); st3.push(st3y);
+    stCum2 += 0; stCum3 += st3y - stBase; dSt2.push(stCum2); dSt3.push(stCum3);
+    w2.push(base.net); w3.push(inc3);
+    firm2.push(V - wI); firm3.push(V - wI - g * 1.01 + (0.025 - p.spread) * Math.max(W,0) * (wIntSh>0?1:0) * wIntSh/((wIPCsh+wIntSh)||1));
+  }
+  // despido a los 55: 10 años post
+  const annW = W > 0 ? W * (rWal>0 ? rWal/(1-Math.pow(1+rWal,-postY)) : 1/postY) : 0;
+  const g20 = p.arch === "cum" ? thetaV * (1 - Math.pow(1 - p.dec, careerY)) : thetaV;
+  let Wt = W;
+  for (let t = 1; t <= postY; t++) {
+    const u = un[t-1];
+    // pigouviano
+    const inc2 = u.net + (t <= p.dur ? trNet : 0);
+    // royalties: flujo decreciente (cum) o plano + anualidad wallet
+    const gPost = p.arch === "cum" ? g20 * Math.pow(1 - p.dec, t) : thetaV;
+    const gPostNet = gPost * (1 - c.capTax);
+    const inc3 = u.net + gPostNet + annW;
+    Wt = Math.max(0, Wt * (1 + rWal) - annW);
+    cont.push(base.net); pig.push(inc2); roy.push(inc3); wal.push(Wt);
+    const stCont = base.it + base.ssc + c.erSSC * gross + c.consTax * 0.85 * base.net;
+    const st2y = u.tax - u.paid + (t<=p.dur ? transfer * p.ttr + recauda*(1-p.alpha) - (p.alpha>0?0:0) : recauda*0) + (t<=p.dur? recauda - transfer - recauda*p.inef*p.alpha - recauda*(1-p.alpha)*0 :0)*0 + (t<=p.dur? recauda*(1-p.alpha) :0) + c.consTax * 0.85 * inc2;
+    const st3y = u.tax - u.paid + gPost * c.capTax + c.consTax * 0.85 * inc3;
+    st2.push(st2y); st3.push(st3y);
+    stCum2 += st2y - stCont; stCum3 += st3y - stCont; dSt2.push(stCum2); dSt3.push(stCum3);
+    w2.push(inc2); w3.push(inc3);
+    firm2.push(V - recauda - (t===1?2.3*gross:0));
+    firm3.push(V - gPost * 1.01 - (t===1?2.3*gross:0) + (0.025 - p.spread) * Wt * wIntSh/((wIPCsh+wIntSh)||1));
+  }
+  // métricas
+  const post = (arr) => arr.slice(careerY);
+  const eta2 = post(w2).reduce((a,b)=>a+b,0)/postY/base.net;
+  const eta3 = post(w3).reduce((a,b)=>a+b,0)/postY/base.net;
+  const NPV = { w2: npv(post(w2), r), w3: npv(post(w3), r),
+    f2: npv(post(firm2), r), f3: npv(post(firm3), r),
+    s2: npv(post(st2), r), s3: npv(post(st3), r),
+    s0: npv(Array(postY).fill(base.it + base.ssc + c.erSSC*gross + c.consTax*0.85*base.net), r) };
+  // contribuyente: brecha fiscal anualizada por contribuyente
+  const ann = (x) => x * r / (1 - Math.pow(1 + r, -postY));
+  const gap2 = ann(NPV.s0 - NPV.s2) * p.exposed / (c.taxpayersM * 1e6);
+  const gap3 = ann(NPV.s0 - NPV.s3) * p.exposed / (c.taxpayersM * 1e6);
+  // thetas derivados
+  const thetaEta1 = (1 - eta0) * base.net / V / (1 - c.capTax);
+  const particip = p.theta >= p.tau * wI * (1 - p.inef) * p.alpha / V;
+  const fImpl = p.tau / (1 - 1 / p.nEf);
+  return { c, base, wI, V, ages, cont, pig, roy, wal, dSt2, dSt3, eta0, eta2, eta3, NPV, gap2, gap3,
+    thetaMin, thetaEta1, particip, fImpl, careerY };
+}
+
+// ---------------- UI helpers ----------------
+const Info = ({ txt }) => {
+  const [o, setO] = useState(false);
+  return (<span className="relative inline-block ml-1 align-middle">
+    <button onClick={()=>setO(!o)} onBlur={()=>setO(false)}
+      className="w-4 h-4 rounded-full text-[10px] leading-4 text-center bg-slate-200 text-slate-600 hover:bg-slate-300">i</button>
+    {o && <span className="absolute z-30 left-5 top-0 w-60 p-2 text-[11px] leading-snug bg-slate-800 text-slate-100 rounded shadow-lg">{txt}</span>}
+  </span>);
+};
+const Slider = ({ label, tip, v, set, min, max, step, fmtV, accent }) => (
+  <div className="mb-2">
+    <div className="flex justify-between text-[12px]">
+      <span className="text-slate-600">{label}<Info txt={tip} /></span>
+      <span className="font-mono font-semibold" style={{color:accent}}>{fmtV(v)}</span>
+    </div>
+    <input type="range" min={min} max={max} step={step} value={v}
+      onChange={(e)=>set(parseFloat(e.target.value))} className="w-full accent-current" style={{color:accent}} />
+  </div>
+);
+
+function App() {
+  const [lang, setLang] = useState("es");
+  const t = T[lang];
+  const [country, setCountry] = useState("ES");
+  const [occIdx, setOccIdx] = useState(3);
+  const occ = OCC[occIdx]; const sec = SECTORS[occ.sector];
+  const c = COUNTRIES[country];
+  const [gross, setGross] = useState(Math.round(occ.sal * COUNTRIES["ES"].wageIdx));
+  const [showSal, setShowSal] = useState(false);
+  // pigouviano
+  const [tau, setTau] = useState(0.20); const [inef, setInef] = useState(0.20);
+  const [alpha, setAlpha] = useState(1.0); const [dur, setDur] = useState(10);
+  const [ttr, setTtr] = useState(0.15); const [nEf, setNEf] = useState(sec.nEf);
+  // royalties
+  const tramoTop = occ.itea >= 80;
+  const [theta, setTheta] = useState(tramoTop ? 0.125 : 0.05);
+  const [kappa, setKappa] = useState(sec.k);
+  const [arch, setArch] = useState("cum");
+  const [dec, setDec] = useState(sec.dec); const [career, setCareer] = useState(20);
+  const [wIPC, setWIPC] = useState(0.5); const [spread, setSpread] = useState(0.02);
+  const [wOut, setWOut] = useState(0.0);
+  // comunes
+  const [haz, setHaz] = useState(0.15); const [pen, setPen] = useState(0.28); const [r, setR] = useState(0.03);
+  const [exposed, setExposed] = useState(165000);
+
+  const selOcc = (i) => { setOccIdx(i); const o = OCC[i], s = SECTORS[o.sector];
+    setGross(Math.round(o.sal * COUNTRIES[country].wageIdx)); setKappa(s.k); setDec(s.dec); setNEf(s.nEf);
+    setTheta(o.itea >= 80 ? 0.125 : (o.itea >= 50 ? 0.05 : 0)); setShowSal(true); };
+  const selCountry = (k) => { setCountry(k); setGross(Math.round(occ.sal * COUNTRIES[k].wageIdx)); setShowSal(true); };
+
+  const R = useMemo(() => simulate({ country, gross, tau, inef, alpha, dur, ttr, nEf,
+    theta, kappa, arch, dec, career, wIPC, spread, wOut, haz, pen, r, exposed }),
+    [country, gross, tau, inef, alpha, dur, ttr, nEf, theta, kappa, arch, dec, career, wIPC, spread, wOut, haz, pen, r, exposed]);
+
+  const BLUE = "#2456A6", GREEN = "#1E7A52", INK = "#16242F", GRAY = "#8A949C";
+  const chartData = R.ages.map((a, i) => ({ age: a, cont: Math.round(R.cont[i]), pig: Math.round(R.pig[i]), roy: Math.round(R.roy[i]), wal: Math.round(R.wal[i]), s2: Math.round(R.dSt2[i]), s3: Math.round(R.dSt3[i]) }));
+
+  // veredictos
+  const verdict = (a, b) => { const d = (b - a) / Math.max(Math.abs(a), Math.abs(b), 1);
+    if (Math.abs(d) < 0.01) return { win: "tie", m: 0 };
+    return b > a ? { win: "roy", m: b - a } : { win: "pig", m: a - b }; };
+  const vW = verdict(R.NPV.w2, R.NPV.w3);
+  const vF = verdict(R.NPV.f2, R.NPV.f3);
+  const vS = verdict(R.NPV.s2, R.NPV.s3);
+  const vT = R.gap3 < R.gap2 - 0.01 ? { win:"roy", m: R.gap2 - R.gap3 } : (R.gap2 < R.gap3 - 0.01 ? { win:"pig", m: R.gap3 - R.gap2 } : { win:"tie", m:0 });
+  const sysName = (w) => w === "roy" ? t.royS : w === "pig" ? t.pigouS : t.tie;
+  const sysColor = (w) => w === "roy" ? GREEN : w === "pig" ? BLUE : GRAY;
+
+  // interpretación generada
+  const interp = useMemo(() => {
+    const L = [];
+    const pct = (x) => (100 * x).toFixed(0) + "%";
+    if (lang === "es") {
+      L.push(`Sin ningún mecanismo, el despido a los 55 dejaría la renta del trabajador en η₀ = ${pct(R.eta0)} de su neto previo. El pigouviano configurado la eleva a η = ${pct(R.eta2)} y el sistema de royalties a η = ${pct(R.eta3)}.`);
+      if (vW.win === "roy") L.push(`Para el trabajador domina el sistema de royalties (+${fmt(vW.m, R.c.cur)} de VAN a 10 años): la acumulación de derechos de CI ${arch==="cum"?`durante ${career} años de carrera prefinancia el shock — la wallet llega al despido con ${fmt(R.wal[R.careerY-1], R.c.cur)}`:"compensa el desplazamiento"}.`);
+      else if (vW.win === "pig") L.push(`Para el trabajador domina el impuesto (+${fmt(vW.m, R.c.cur)}): con θ = ${pct(theta)} el royalty entrega menos que la transferencia fiscal neta. La condición de participación ${R.particip ? "se cumple" : `exige θ ≥ ${pct(tau * R.wI * (1-inef) * alpha / R.V)}`}.`);
+      if (R.eta3 > 1) L.push(`Atención: η > 1 — el royalty sobrecompensa y entraría en territorio de subautomatización (Corolario 2); considere reducir θ o el horizonte de acumulación.`);
+      if (occ.itea < 50) L.push(`Esta ocupación está por debajo del percentil 50 ITEA: queda fuera del ámbito de cobertura de θ; el sistema de royalties no aplica y la comparación es solo informativa.`);
+      L.push(`Para el Estado, el coste fiscal dominante es la recaudación evaporada (IRPF + cotizaciones + consumo del salario destruido); el sistema con mejor saldo es ${sysName(vS.win)}. Trasladado al contribuyente ${R.c.name.es.toLowerCase().startsWith("e")?"de":"de"} ${R.c.name.es}, la factura anual es ${R.c.cur}${R.gap2.toFixed(1)} (pigouviano) frente a ${R.c.cur}${R.gap3.toFixed(1)} (royalties) ${t.perTaxpayerYr}, para ${exposed.toLocaleString()} trabajadores expuestos.`);
+      L.push(`La empresa prefiere ${sysName(vF.win)}: paga ${pct(tau)} de τ sobre wᴵ en el impuesto frente a θ·κ = ${pct(theta * kappa)} del coste laboral en royalties${spread>0 && wIPC<1 ? `, parcialmente compensado por financiación cautiva a IPC+${pct(spread)} (por debajo de su coste de deuda)`:""}.`);
+    } else {
+      L.push(`With no mechanism, dismissal at 55 would leave the worker at η₀ = ${pct(R.eta0)} of prior net income. The configured Pigouvian tax raises it to η = ${pct(R.eta2)}; the royalty system to η = ${pct(R.eta3)}.`);
+      if (vW.win === "roy") L.push(`For the worker, royalties dominate (+${fmt(vW.m, R.c.cur)} 10-year NPV): IC rights accrued ${arch==="cum"?`over ${career} career years pre-fund the shock — the wallet reaches dismissal with ${fmt(R.wal[R.careerY-1], R.c.cur)}`:"compensate displacement"}.`);
+      else if (vW.win === "pig") L.push(`For the worker, the tax dominates (+${fmt(vW.m, R.c.cur)}): at θ = ${pct(theta)} the royalty delivers less than the net fiscal transfer. The participation condition ${R.particip ? "holds" : `requires θ ≥ ${pct(tau * R.wI * (1-inef) * alpha / R.V)}`}.`);
+      if (R.eta3 > 1) L.push(`Warning: η > 1 — the royalty overcompensates, entering under-automation territory (Corollary 2); consider lowering θ or the accumulation horizon.`);
+      if (occ.itea < 50) L.push(`This occupation is below the 50th ITEA percentile: outside θ coverage; the royalty system does not apply and the comparison is informative only.`);
+      L.push(`For the State, the dominant fiscal cost is evaporated revenue (income tax + social security + consumption of the destroyed wage); the better-balanced system is ${sysName(vS.win)}. Passed to ${R.c.name.en} taxpayers, the annual bill is ${R.c.cur}${R.gap2.toFixed(1)} (Pigouvian) vs ${R.c.cur}${R.gap3.toFixed(1)} (royalties) ${t.perTaxpayerYr}, for ${exposed.toLocaleString()} exposed workers.`);
+      L.push(`The firm prefers ${sysName(vF.win)}: it pays τ = ${pct(tau)} of wᴵ under the tax vs θ·κ = ${pct(theta * kappa)} of labour cost under royalties${spread>0 && wIPC<1 ? `, partly offset by captive funding at CPI+${pct(spread)} (below its cost of debt)`:""}.`);
+    }
+    return L;
+  }, [R, lang, vW, vF, vS, theta, tau, kappa, arch, career, spread, wIPC, exposed, occ, inef, alpha]);
+
+  const Card = ({ title, v, detail }) => (
+    <div className="rounded-lg border p-3 bg-white" style={{borderColor:"#DDE3E8"}}>
+      <div className="text-[11px] uppercase tracking-wider text-slate-500">{title}</div>
+      <div className="text-lg font-semibold mt-1" style={{ color: sysColor(v.win), fontFamily:"'IBM Plex Serif',serif" }}>{sysName(v.win)}</div>
+      <div className="text-[12px] text-slate-600 mt-0.5">{detail}</div>
+      <div className="h-1.5 mt-2 rounded bg-slate-100 overflow-hidden">
+        <div className="h-full rounded" style={{ width: v.win==="tie"?"4%":"70%", background: sysColor(v.win) }} />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen" style={{ background:"#EEF1F4", color:INK, fontFamily:"'IBM Plex Sans',system-ui,sans-serif" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&family=IBM+Plex+Mono:wght@500&display=swap');
+        input[type=range]{height:4px;}`}</style>
+      {/* header */}
+      <header className="px-6 py-4 flex items-baseline justify-between border-b" style={{borderColor:"#D7DEE4", background:"#FFFFFF"}}>
+        <div>
+          <h1 className="text-xl font-semibold" style={{fontFamily:"'IBM Plex Serif',serif"}}>{t.title}
+            <span className="ml-3 text-[11px] font-mono px-2 py-0.5 rounded" style={{background:"#16242F", color:"#fff"}}>v1.0</span></h1>
+          <p className="text-[12px] text-slate-500">{t.subtitle}</p>
+        </div>
+        <div className="flex gap-1 text-[12px]">
+          {["es","en"].map(l => <button key={l} onClick={()=>setLang(l)}
+            className={`px-2.5 py-1 rounded border ${lang===l?"bg-slate-800 text-white border-slate-800":"bg-white text-slate-600 border-slate-300"}`}>{l.toUpperCase()}</button>)}
+        </div>
+      </header>
+
+      <main className="p-5 max-w-6xl mx-auto">
+        {/* configuración */}
+        <section className="rounded-lg bg-white border p-4 mb-4" style={{borderColor:"#DDE3E8"}}>
+          <h2 className="text-[12px] uppercase tracking-wider text-slate-500 mb-3">{t.cfg}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-[13px]">
+            <label className="block">{t.country}
+              <select value={country} onChange={(e)=>selCountry(e.target.value)} className="w-full mt-1 border rounded px-2 py-1.5 bg-white">
+                {Object.entries(COUNTRIES).map(([k,v])=><option key={k} value={k}>{v.name[lang]}</option>)}
+              </select></label>
+            <label className="block md:col-span-2">{t.occ}
+              <select value={occIdx} onChange={(e)=>selOcc(parseInt(e.target.value))} className="w-full mt-1 border rounded px-2 py-1.5 bg-white">
+                {OCC.map((o,i)=><option key={o.soc} value={i}>{o.soc} · {o[lang]} — ITEA P{o.itea}</option>)}
+              </select></label>
+            <label className="block">{t.exposed}
+              <input type="number" value={exposed} onChange={(e)=>setExposed(parseInt(e.target.value)||0)}
+                className="w-full mt-1 border rounded px-2 py-1.5 font-mono" /></label>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 mt-3 text-[13px]">
+            <button onClick={()=>setShowSal(true)} className="px-3 py-1.5 rounded text-white" style={{background:INK}}>
+              {t.gross}: <span className="font-mono">{fmt(gross, c.cur)}</span></button>
+            <span className="text-slate-500">{t.itea_pct}: <b>P{occ.itea}</b> · {sec[lang]} · κ Forbes {sec.k}×</span>
+            {occ.itea < 50 && <span className="text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5 text-[12px]">{t.outOfScope}</span>}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-[12px]">
+            {[[t.netSalary, fmt(R.base.net, c.cur)],[t.withheld, fmt(R.base.it, c.cur)],[t.ssc, fmt(R.base.ssc, c.cur)],["wᴵ", fmt(R.wI, c.cur)]].map(([k,v])=>(
+              <div key={k} className="rounded border px-2.5 py-1.5" style={{borderColor:"#E4E9ED", background:"#F8FAFB"}}>
+                <div className="text-slate-500">{k}</div><div className="font-mono font-semibold">{v}</div></div>))}
+          </div>
+        </section>
+
+        {/* ventana emergente salario */}
+        {showSal && <div className="fixed inset-0 z-40 flex items-center justify-center" style={{background:"rgba(22,36,47,.45)"}}>
+          <div className="bg-white rounded-lg p-5 w-80 shadow-xl">
+            <h3 className="font-semibold mb-1" style={{fontFamily:"'IBM Plex Serif',serif"}}>{t.gross}</h3>
+            <p className="text-[12px] text-slate-500 mb-3">{COUNTRIES[country].name[lang]} · {occ[lang]}</p>
+            <input type="number" value={gross} onChange={(e)=>setGross(parseInt(e.target.value)||0)}
+              className="w-full border rounded px-3 py-2 font-mono text-lg" autoFocus />
+            <button onClick={()=>setShowSal(false)} className="mt-3 w-full py-2 rounded text-white" style={{background:INK}}>OK</button>
+          </div></div>}
+
+        {/* paneles de sistemas */}
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <section className="rounded-lg bg-white border-t-4 p-4" style={{borderTopColor:BLUE, borderLeft:"1px solid #DDE3E8", borderRight:"1px solid #DDE3E8", borderBottom:"1px solid #DDE3E8"}}>
+            <h2 className="font-semibold mb-3" style={{color:BLUE, fontFamily:"'IBM Plex Serif',serif"}}>{t.pigou}</h2>
+            <Slider label={t.vars.tau[0]} tip={t.vars.tau[1]} v={tau} set={setTau} min={0.005} max={0.50} step={0.005} fmtV={(v)=> (100*v).toFixed(1)+"%"} accent={BLUE}/>
+            <Slider label={t.vars.inef[0]} tip={t.vars.inef[1]} v={inef} set={setInef} min={0.05} max={0.45} step={0.01} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={BLUE}/>
+            <Slider label={t.vars.alpha[0]} tip={t.vars.alpha[1]} v={alpha} set={setAlpha} min={0} max={1} step={0.05} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={BLUE}/>
+            <Slider label={t.vars.dur[0]} tip={t.vars.dur[1]} v={dur} set={setDur} min={1} max={10} step={1} fmtV={(v)=>v+" a"} accent={BLUE}/>
+            <Slider label={t.vars.ttr[0]} tip={t.vars.ttr[1]} v={ttr} set={setTtr} min={0} max={0.45} step={0.01} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={BLUE}/>
+            <Slider label={t.vars.nEf[0]} tip={t.vars.nEf[1]} v={nEf} set={setNEf} min={2} max={60} step={1} fmtV={(v)=>"N="+v} accent={BLUE}/>
+            <div className="text-[11px] text-slate-500 mt-1 font-mono">{t.fImpl}: f = {(R.fImpl).toFixed(2)} {R.fImpl>0.4 && "⚠"}</div>
+          </section>
+
+          <section className="rounded-lg bg-white border-t-4 p-4" style={{borderTopColor:GREEN, borderLeft:"1px solid #DDE3E8", borderRight:"1px solid #DDE3E8", borderBottom:"1px solid #DDE3E8"}}>
+            <h2 className="font-semibold mb-3" style={{color:GREEN, fontFamily:"'IBM Plex Serif',serif"}}>{t.roy}</h2>
+            <Slider label={`${t.vars.theta[0]} (${occ.itea>=80?"Top 20":"P50–P95"})`} tip={t.vars.theta[1]} v={theta} set={setTheta}
+              min={occ.itea>=80?0.05:0.0025} max={occ.itea>=80?0.20:0.15} step={0.0025} fmtV={(v)=>(100*v).toFixed(2)+"%"} accent={GREEN}/>
+            <Slider label={t.vars.kappa[0]} tip={t.vars.kappa[1]} v={kappa} set={setKappa} min={1.0} max={4.0} step={0.05} fmtV={(v)=>v.toFixed(2)+"×"} accent={GREEN}/>
+            <div className="flex items-center gap-2 mb-2 text-[12px]">
+              <span className="text-slate-600">{t.vars.arch[0]}<Info txt={t.vars.arch[1]}/></span>
+              {[["flat", lang==="es"?"Plana":"Flat"],["cum", lang==="es"?"Acumulativa":"Cumulative"]].map(([k,lbl])=>(
+                <button key={k} onClick={()=>setArch(k)} className={`px-2 py-0.5 rounded border ${arch===k?"text-white":"text-slate-600"}`}
+                  style={{background:arch===k?GREEN:"#fff", borderColor:arch===k?GREEN:"#CBD5DC"}}>{lbl}</button>))}
+            </div>
+            {arch==="cum" && <>
+              <Slider label={t.vars.dec[0]} tip={t.vars.dec[1]} v={dec} set={setDec} min={0.10} max={0.25} step={0.005} fmtV={(v)=>(100*v).toFixed(1)+"%"} accent={GREEN}/>
+              <Slider label={t.vars.career[0]} tip={t.vars.career[1]} v={career} set={setCareer} min={5} max={35} step={1} fmtV={(v)=>v+" a"} accent={GREEN}/>
+            </>}
+            <Slider label={t.vars.wIPC[0]} tip={t.vars.wIPC[1]} v={wIPC} set={setWIPC} min={0} max={1} step={0.05} fmtV={(v)=>(100*v).toFixed(0)+"% IPC / "+(100*(1-v)).toFixed(0)+"% int."} accent={GREEN}/>
+            <Slider label={t.vars.spread[0]} tip={t.vars.spread[1]} v={spread} set={setSpread} min={0.005} max={0.04} step={0.0025} fmtV={(v)=>"IPC+"+(100*v).toFixed(2)+"%"} accent={GREEN}/>
+            <Slider label={t.vars.wOut[0]} tip={t.vars.wOut[1]} v={wOut} set={setWOut} min={0} max={1} step={0.05} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={GREEN}/>
+            {(1-wIPC)*(1-wOut) > 0.5 && <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mt-1">
+              {lang==="es"?"Concentración de riesgo: >50% de la wallet financia a la empresa que puede despedirle.":"Risk concentration: >50% of the wallet funds the firm that may dismiss the worker."}</div>}
+          </section>
+        </div>
+
+        {/* derivados */}
+        <section className="rounded-lg bg-white border p-3 mb-4 text-[12px] grid grid-cols-2 md:grid-cols-4 gap-2 font-mono" style={{borderColor:"#DDE3E8"}}>
+          <div><span className="text-slate-500 font-sans">{t.thetaMin}: </span>{(100*R.thetaMin).toFixed(1)}%</div>
+          <div><span className="text-slate-500 font-sans">{t.thetaEta}: </span>{(100*R.thetaEta1).toFixed(1)}%</div>
+          <div style={{color: R.particip ? GREEN : "#B4232A"}}><span className="text-slate-500 font-sans">{t.particip}: </span>{R.particip?t.ok:t.ko}</div>
+          <div style={{color: R.eta3>1 ? "#B4232A" : INK}}><span className="text-slate-500 font-sans">η: </span>{R.eta2.toFixed(2)} / {R.eta3.toFixed(2)} {R.eta3>1 && "⚠"}</div>
+        </section>
+
+        {/* veredicto 4 actores */}
+        <section className="mb-4">
+          <h2 className="text-[12px] uppercase tracking-wider text-slate-500 mb-2">{t.results}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card title={t.worker} v={vW} detail={`Δ ${fmt(vW.m, c.cur)} · η ${R.eta2.toFixed(2)} vs ${R.eta3.toFixed(2)}`} />
+            <Card title={t.firm} v={vF} detail={`Δ ${fmt(vF.m, c.cur)} NPV`} />
+            <Card title={t.state} v={vS} detail={`Δ ${fmt(vS.m, c.cur)} NPV`} />
+            <Card title={t.taxpayer} v={vT} detail={`${c.cur}${R.gap2.toFixed(1)} vs ${c.cur}${R.gap3.toFixed(1)} ${t.perTaxpayerYr}`} />
+          </div>
+        </section>
+
+        {/* gráficas */}
+        <section className="mb-4">
+          <h2 className="text-[12px] uppercase tracking-wider text-slate-500 mb-2">{t.charts}</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg border p-3" style={{borderColor:"#DDE3E8"}}>
+              <div className="text-[12px] font-medium mb-1">{t.incomeChart}</div>
+              <ResponsiveContainer width="100%" height={210}>
+                <LineChart data={chartData} margin={{left:6,right:8,top:6}}>
+                  <CartesianGrid stroke="#EDF1F4" vertical={false}/>
+                  <XAxis dataKey="age" tick={{fontSize:10}} /><YAxis tick={{fontSize:10}} width={52}/>
+                  <RTooltip formatter={(v)=>fmt(v,c.cur)} labelFormatter={(a)=>`${t.age} ${a}`}/>
+                  <ReferenceLine x={55} stroke="#B4232A" strokeDasharray="4 3" label={{value:t.dismissal, fontSize:9, fill:"#B4232A", position:"insideTopRight"}}/>
+                  <Line dataKey="cont" name={t.continuity} stroke={GRAY} dot={false} strokeDasharray="3 3"/>
+                  <Line dataKey="pig" name={t.pigouS} stroke={BLUE} dot={false} strokeWidth={2}/>
+                  <Line dataKey="roy" name={t.royS} stroke={GREEN} dot={false} strokeWidth={2}/>
+                  <Legend wrapperStyle={{fontSize:10}}/>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-lg border p-3" style={{borderColor:"#DDE3E8"}}>
+              <div className="text-[12px] font-medium mb-1">{t.walletChart}</div>
+              <ResponsiveContainer width="100%" height={210}>
+                <AreaChart data={chartData} margin={{left:6,right:8,top:6}}>
+                  <CartesianGrid stroke="#EDF1F4" vertical={false}/>
+                  <XAxis dataKey="age" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={52}/>
+                  <RTooltip formatter={(v)=>fmt(v,c.cur)} labelFormatter={(a)=>`${t.age} ${a}`}/>
+                  <ReferenceLine x={55} stroke="#B4232A" strokeDasharray="4 3"/>
+                  <Area dataKey="wal" name="Wallet" stroke={GREEN} fill={GREEN} fillOpacity={0.12}/>
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-lg border p-3 md:col-span-2" style={{borderColor:"#DDE3E8"}}>
+              <div className="text-[12px] font-medium mb-1">{t.stateChart}</div>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={chartData} margin={{left:6,right:8,top:6}}>
+                  <CartesianGrid stroke="#EDF1F4" vertical={false}/>
+                  <XAxis dataKey="age" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={60}/>
+                  <RTooltip formatter={(v)=>fmt(v,c.cur)} labelFormatter={(a)=>`${t.age} ${a}`}/>
+                  <ReferenceLine y={0} stroke="#C3CCD3"/><ReferenceLine x={55} stroke="#B4232A" strokeDasharray="4 3"/>
+                  <Line dataKey="s2" name={t.pigouS} stroke={BLUE} dot={false} strokeWidth={2}/>
+                  <Line dataKey="s3" name={t.royS} stroke={GREEN} dot={false} strokeWidth={2}/>
+                  <Legend wrapperStyle={{fontSize:10}}/>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        {/* parámetros comunes */}
+        <section className="rounded-lg bg-white border p-4 mb-4" style={{borderColor:"#DDE3E8"}}>
+          <h2 className="text-[12px] uppercase tracking-wider text-slate-500 mb-2">{t.advanced}</h2>
+          <div className="grid md:grid-cols-3 gap-x-6">
+            <Slider label={t.vars.haz[0]} tip={t.vars.haz[1]} v={haz} set={setHaz} min={0.05} max={0.30} step={0.01} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={INK}/>
+            <Slider label={t.vars.pen[0]} tip={t.vars.pen[1]} v={pen} set={setPen} min={0.10} max={0.45} step={0.01} fmtV={(v)=>(100*v).toFixed(0)+"%"} accent={INK}/>
+            <Slider label={t.vars.r[0]} tip={t.vars.r[1]} v={r} set={setR} min={0.02} max={0.05} step={0.0025} fmtV={(v)=>(100*v).toFixed(2)+"%"} accent={INK}/>
+          </div>
+        </section>
+
+        {/* interpretación */}
+        <section className="rounded-lg border p-4 mb-8" style={{borderColor:"#DDE3E8", background:"#FBFCFC"}}>
+          <h2 className="text-[12px] uppercase tracking-wider text-slate-500 mb-2">{t.interp}</h2>
+          {interp.map((p,i)=><p key={i} className="text-[13px] leading-relaxed mb-2 text-slate-700">{p}</p>)}
+          <p className="text-[10px] text-slate-400 mt-3">ITEA Framework · Paper 8B (García-Lluis Valencia, 2026) · κ_V, N: Forbes Global 2000 (2014–2024) · {lang==="es"?"Fiscalidad aproximada 2026; valores reales (descontada inflación). Percentiles ITEA ilustrativos editables en código.":"Approximate 2026 taxation; real terms. ITEA percentiles illustrative, editable in code."}</p>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

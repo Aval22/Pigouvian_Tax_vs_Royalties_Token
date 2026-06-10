@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "Pigouvian Tax vs Royalties Token: a comparative simulator of compensation mechanisms for agentic-AI displacement"
+version: "1.0.0"
+date-released: "2026-06-10"
+authors:
+  - family-names: "García-Lluis Valencia"
+    given-names: "Alberto"
+    orcid: "https://orcid.org/0009-0003-1438-1633"
+    affiliation: "Universidad Rey Juan Carlos"
+keywords: [automation, pigouvian tax, royalties, tokenization, ITEA, labor economics, algorithmic expropriation]
+license: MIT
+repository-code: "https://github.com/Aval22/pigouvian-tax-vs-royalties-token"
