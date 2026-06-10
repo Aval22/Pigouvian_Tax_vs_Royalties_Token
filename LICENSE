@@ -1,21 +1,108 @@
-MIT License
+LICENCIA PROPIETARIA — USO NO COMERCIAL CON RESERVA DE DERECHOS
+PROPRIETARY LICENSE — NON-COMMERCIAL USE WITH RESERVED RIGHTS
 
-Copyright (c) 2026 Alberto García-Lluis Valencia
+Copyright (c) 2026 Alberto García-Lluis Valencia. Todos los derechos reservados / All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+====================================================================
+VERSIÓN EN ESPAÑOL
+====================================================================
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. TITULARIDAD
+Alberto García-Lluis Valencia (el "Titular") es el único propietario intelectual
+del modelo teórico, los algoritmos, el código fuente, los datos derivados, los
+informes, las figuras, el dashboard y la totalidad del desarrollo contenidos en
+este repositorio (la "Obra"). Todos los derechos de propiedad intelectual e
+industrial sobre la Obra quedan reservados al Titular.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. USOS PERMITIDOS SIN AUTORIZACIÓN PREVIA
+Se permite, de forma gratuita y revocable, únicamente para fines NO COMERCIALES:
+   (a) consultar, leer y descargar la Obra;
+   (b) usarla con fines de estudio personal, docencia e investigación académica;
+   (c) citarla con atribución expresa al Titular, conforme al archivo CITATION.cff.
+Cualquier uso al amparo de este apartado debe conservar este aviso de licencia y
+la atribución de autoría.
+
+3. USOS QUE REQUIEREN AUTORIZACIÓN ESCRITA
+Queda PROHIBIDO, sin autorización previa y por escrito del Titular, todo uso
+COMERCIAL de la Obra o de la información que contiene, incluyendo, sin carácter
+limitativo:
+   (a) su explotación, comercialización, venta, sublicencia o cesión;
+   (b) su incorporación a productos, servicios o procesos con ánimo de lucro;
+   (c) la prestación de servicios de consultoría, asesoramiento o análisis
+       basados en la Obra;
+   (d) su uso por entidades con fines lucrativos, públicas o privadas, en el
+       marco de su actividad económica.
+La autorización deberá obtenerse del Titular por escrito y podrá someterse a las
+condiciones económicas y de uso que el Titular determine.
+
+4. INDEMNIZACIÓN POR USO NO AUTORIZADO
+El uso comercial de la Obra sin la autorización escrita exigida en la cláusula 3
+constituirá un incumplimiento que dará derecho al Titular a una indemnización
+equivalente al CUARENTA POR CIENTO (40%) de la facturación total obtenida por el
+infractor en relación con dicho uso hasta el momento de su cese, en concepto de
+daño emergente y lucro cesante, sin perjuicio de las demás acciones legales que
+correspondan al Titular y de la obligación de cesar inmediatamente en el uso.
+
+5. AUSENCIA DE GARANTÍA
+La Obra se proporciona "TAL CUAL", sin garantía de ningún tipo. El Titular no
+será responsable de reclamaciones, daños u otras responsabilidades derivadas del
+uso de la Obra.
+
+6. LEGISLACIÓN Y JURISDICCIÓN
+Esta licencia se rige por la legislación española. Para cualquier controversia,
+las partes se someten a los juzgados y tribunales competentes según la ley
+aplicable.
+
+Contacto para autorizaciones: Alberto García-Lluis Valencia
+ORCID: https://orcid.org/0009-0003-1438-1633
+
+====================================================================
+ENGLISH VERSION (courtesy translation; the Spanish text prevails)
+====================================================================
+
+1. OWNERSHIP
+Alberto García-Lluis Valencia (the "Owner") is the sole intellectual owner of the
+theoretical model, algorithms, source code, derived data, reports, figures,
+dashboard and the entire development contained in this repository (the "Work").
+All intellectual and industrial property rights in the Work are reserved to the
+Owner.
+
+2. USES PERMITTED WITHOUT PRIOR AUTHORIZATION
+The following are permitted, free of charge and revocably, for NON-COMMERCIAL
+purposes only:
+   (a) viewing, reading and downloading the Work;
+   (b) use for personal study, teaching and academic research;
+   (c) citation with express attribution to the Owner, per CITATION.cff.
+Any such use must preserve this license notice and the authorship attribution.
+
+3. USES REQUIRING WRITTEN AUTHORIZATION
+Any COMMERCIAL use of the Work or of the information it contains is PROHIBITED
+without the prior written authorization of the Owner, including, without
+limitation:
+   (a) its exploitation, commercialization, sale, sublicensing or assignment;
+   (b) its incorporation into for-profit products, services or processes;
+   (c) the provision of consulting, advisory or analytical services based on the
+       Work;
+   (d) its use by for-profit entities, public or private, within their economic
+       activity.
+Authorization must be obtained from the Owner in writing and may be subject to
+the financial and usage conditions the Owner determines.
+
+4. INDEMNIFICATION FOR UNAUTHORIZED USE
+Commercial use of the Work without the written authorization required in
+clause 3 shall constitute a breach entitling the Owner to compensation equal to
+FORTY PERCENT (40%) of the total revenue obtained by the infringer in connection
+with such use up to the moment it ceases, as consequential damage and loss of
+profit, without prejudice to any other legal action available to the Owner and
+to the obligation to cease the use immediately.
+
+5. NO WARRANTY
+The Work is provided "AS IS", without warranty of any kind. The Owner shall not
+be liable for any claim, damages or other liability arising from use of the Work.
+
+6. GOVERNING LAW AND JURISDICTION
+This license is governed by Spanish law. Any dispute shall be submitted to the
+competent courts under the applicable law.
+
+Contact for authorizations: Alberto García-Lluis Valencia
+ORCID: https://orcid.org/0009-0003-1438-1633

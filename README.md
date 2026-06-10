@@ -34,4 +34,6 @@ García-Lluis Valencia, A. (2026). *Pigouvian Tax vs Royalties Token: a comparat
 
 ## Licencia / License
 
-MIT — see `LICENSE`.
+**Licencia propietaria — uso no comercial con reserva de derechos.** Propiedad intelectual de Alberto García-Lluis Valencia. Se permite el uso académico, docente y de investigación con atribución; **todo uso comercial requiere autorización escrita del autor**. El uso comercial no autorizado conlleva una indemnización del 40% de la facturación obtenida (daño emergente y lucro cesante). Véase el archivo [`LICENSE`](LICENSE).
+
+**Proprietary license — non-commercial use with reserved rights.** Intellectual property of Alberto García-Lluis Valencia. Academic, teaching and research use permitted with attribution; **any commercial use requires the author's written authorization**. Unauthorized commercial use carries a 40% revenue indemnification (consequential damage and loss of profit). See [`LICENSE`](LICENSE).
