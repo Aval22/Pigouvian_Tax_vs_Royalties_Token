@@ -100,6 +100,16 @@
   html[data-lang="en"] [data-lang-es]{display:none}
   html[data-lang="en"] [data-lang-en]{display:revert}
 
+  .mech .vh{font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark);font-weight:700;margin:16px 0 7px}
+  .mech.tax .vh{color:var(--blue)}
+  ul.varlist{list-style:none;margin:0 0 4px;padding:0}
+  ul.varlist li{position:relative;padding-left:16px;margin-bottom:7px;font-size:.93rem;color:var(--ink);line-height:1.5}
+  ul.varlist li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--green)}
+  .mech.tax ul.varlist li::before{background:var(--blue)}
+  ul.varlist li b{color:var(--navy)}
+  .mech .eq{font-family:var(--serif);background:#f1f5fa;border:1px solid var(--line);border-radius:8px;padding:7px 12px;display:inline-block;font-size:.95rem;color:var(--navy);margin:2px 0 2px}
+  .mech .proc{font-size:.93rem;color:var(--muted);margin:6px 0 0;line-height:1.55}
+
   @media(max-width:760px){
     .two,.findings,.cards,.figrow{grid-template-columns:1fr}
     .hero h1{font-size:1.9rem}
@@ -128,8 +138,8 @@
     <h1 data-lang-es>Impuesto pigouviano <em>vs.</em> royalties tokenizados de capital intelectual</h1>
     <h1 data-lang-en>Pigouvian tax <em>vs.</em> tokenized intellectual-capital royalties</h1>
 
-    <p class="lead" data-lang-es>Dos formas de compensar el desplazamiento laboral por IA agéntica: ¿gravar la automatización (el Estado recauda) o reconocer al trabajador una regalía sobre el valor que su conocimiento sigue generando? Este proyecto las modela, las compara y las simula en 9 países.</p>
-    <p class="lead" data-lang-en>Two ways to compensate labor displaced by agentic AI: tax automation (the State collects) or grant the worker a royalty on the value their knowledge keeps generating. This project models, compares and simulates both across 9 countries.</p>
+    <p class="lead" data-lang-es>Dos formas de compensar el desplazamiento laboral por IA agéntica: ¿gravar la automatización (el Estado recauda) o reconocer al trabajador una regalía sobre el valor que su conocimiento sigue generando? Este proyecto las modela, las compara y las simula en 9 países para evaluar cuándo la regalía resulta <strong>Pareto-dominante</strong> sobre el impuesto.</p>
+    <p class="lead" data-lang-en>Two ways to compensate labor displaced by agentic AI: tax automation (the State collects) or grant the worker a royalty on the value their knowledge keeps generating. This project models, compares and simulates both across 9 countries to assess when the royalty is <strong>Pareto-dominant</strong> over the tax.</p>
 
     <div class="cta">
       <a class="btn primary" href="dashboard.html"><span>▶</span><span data-lang-es>Abrir el dashboard interactivo</span><span data-lang-en>Open interactive dashboard</span></a>
@@ -145,8 +155,17 @@
     <p class="eyebrow" data-lang-en>The two ideas in a minute</p>
     <h2 data-lang-es>¿De qué trata el proyecto?</h2>
     <h2 data-lang-en>What is this about?</h2>
-    <p class="sub" data-lang-es>Cuando una IA absorbe las tareas y el conocimiento de un trabajador para sustituirlo, surge una externalidad. La política puede responder de dos maneras opuestas. El marco ITEA las pone frente a frente.</p>
-    <p class="sub" data-lang-en>When an AI absorbs a worker's tasks and knowledge to replace them, an externality arises. Policy can respond in two opposite ways. The ITEA framework sets them side by side.</p>
+    <p class="sub" style="margin-bottom:16px" data-lang-es>Existe hoy un <strong>debate académico abierto</strong> sobre la necesidad de corregir la tendencia a prescindir de profesionales por el impacto de la IA. Aunque el fenómeno aún no es generalizado en el conjunto de la economía, empieza a tener un impacto elevado a través de <strong>prejubilaciones y bajas incentivadas</strong> que retiran del mercado conocimiento acumulado durante décadas. El despido anunciado por McKinsey en diciembre de 2025 (~5.000 puestos, en torno al 10% del personal no orientado a cliente) muestra que ya alcanza a los servicios profesionales cualificados.</p>
+    <p class="sub" style="margin-bottom:16px" data-lang-en>There is today an <strong>open academic debate</strong> about the need to correct the trend of letting professionals go because of AI's impact. Although the phenomenon is not yet generalized across the economy, it is beginning to have a strong impact through <strong>early retirements and incentivized exits</strong> that remove decades of accumulated knowledge from the market. McKinsey's December 2025 layoff (~5,000 roles, around 10% of non-client-facing staff) shows it already reaches skilled professional services.</p>
+
+    <p class="sub" style="margin-bottom:16px" data-lang-es>Hasta ahora, el único instrumento contemplado para internalizar ese daño era el <strong>impuesto pigouviano</strong>. Este aporte amplía el abanico y considera otras opciones: en particular, <strong>tokenizar la transferencia de capital intelectual</strong> que un profesional realiza a lo largo de toda su vida laboral en su relación con la empresa.</p>
+    <p class="sub" style="margin-bottom:16px" data-lang-en>Until now, the only instrument considered to internalize that harm was the <strong>Pigouvian tax</strong>. This contribution widens the range and considers other options: in particular, <strong>tokenizing the transfer of intellectual capital</strong> that a professional builds up throughout their entire working life in their relationship with the firm.</p>
+
+    <p class="sub" style="margin-bottom:16px" data-lang-es>La base teórica es el resultado de <strong>Falk y Tsoukalas (2026)</strong>: bajo automatización competitiva, ningún mecanismo voluntario corrige la externalidad y solo el impuesto pigouviano la internaliza. Pero su propio Corolario 2 deja una grieta — si el trabajador recupera por completo la renta desplazada (η→1), la sobreautomatización se corrige <em>sin</em> impuesto. El royalty tokenizado es precisamente el instrumento que empuja η hacia 1.</p>
+    <p class="sub" style="margin-bottom:16px" data-lang-en>The theoretical basis is the result of <strong>Falk and Tsoukalas (2026)</strong>: under competitive automation, no voluntary mechanism corrects the externality and only the Pigouvian tax internalizes it. Yet their own Corollary 2 leaves a crack — if the worker fully recovers the displaced income (η→1), over-automation is corrected <em>without</em> a tax. The tokenized royalty is precisely the instrument that pushes η toward 1.</p>
+
+    <p class="sub" data-lang-es>El modelo parte de los datos del <a href="https://aval22.github.io/ITEA/" target="_blank" rel="noopener">marco ITEA</a> y del concepto de <em>royalty</em>: el mismo símil que desde hace décadas regula la compensación en el <strong>cine, la música, los videojuegos, las patentes</strong> y otros ámbitos. Tres precedentes jurídicos reales encarnan ese principio: los <strong>residuales del Writers Guild of America</strong> (guionistas), la ley alemana de invenciones de empleados (<strong>Arbeitnehmererfindungsgesetz</strong>, 1957/2009) y la <strong>Bayh-Dole Act</strong> estadounidense (patentes universitarias, 1980) — en todos ellos, quien aporta una obra o un conocimiento conserva un derecho sobre el valor que este sigue generando. El marco ITEA pone ambas respuestas frente a frente.</p>
+    <p class="sub" data-lang-en>The model builds on data from the <a href="https://aval22.github.io/ITEA/" target="_blank" rel="noopener">ITEA framework</a> and on the concept of a <em>royalty</em>: the same analogy that for decades has governed compensation in <strong>film, music, video games, patents</strong> and similar fields. Three real legal precedents embody this principle: <strong>Writers Guild of America residuals</strong> (screenwriters), the German employee-invention law (<strong>Arbeitnehmererfindungsgesetz</strong>, 1957/2009) and the U.S. <strong>Bayh-Dole Act</strong> (university patents, 1980) — in all of them, whoever contributes a work or a body of knowledge retains a claim on the value it keeps generating. The ITEA framework sets both responses side by side.</p>
 
     <div class="two">
       <div class="mech tax">
@@ -166,6 +185,92 @@
         <h3 data-lang-en>Tokenized intellectual-capital royalty</h3>
         <p data-lang-es>El trabajador cuyo conocimiento queda incorporado a la IA conserva una regalía (θ) sobre el valor que esta genera, financiada por la empresa. Tesis ITEA: el saber es <em>expropiado pero retenido</em>. Su valor se acumula con el tiempo.</p>
         <p data-lang-en>The worker whose knowledge is embedded in the AI retains a royalty (θ) on the value it generates, financed by the firm. ITEA thesis: knowledge is <em>expropriated yet retained</em>. Its value compounds over time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELS / TEST BENCH -->
+<section style="background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <p class="eyebrow" data-lang-es>El banco de pruebas</p>
+    <p class="eyebrow" data-lang-en>The test bench</p>
+    <h2 data-lang-es>Los dos modelos que se enfrentan</h2>
+    <h2 data-lang-en>The two models put head to head</h2>
+    <p class="sub" data-lang-es>Para determinar de forma científica qué mecanismo es más eficiente no basta con razonar en abstracto: es imprescindible <strong>observar y comparar ambos escenarios en un entorno de pruebas</strong>. El dashboard interactivo actúa como ese banco de pruebas — enfrenta los dos modelos bajo los mismos supuestos y permite extraer unas primeras conclusiones analíticas sobre qué sistema domina, para quién y en qué condiciones. Antes de simular, conviene describir los dos modelos que compiten.</p>
+    <p class="sub" data-lang-en>To determine scientifically which mechanism is more efficient, abstract reasoning is not enough: it is essential to <strong>observe and compare both scenarios in a test environment</strong>. The interactive dashboard acts as that test bench — it pits the two models against each other under the same assumptions and yields first analytical conclusions about which system dominates, for whom and under what conditions. Before simulating, it is worth describing the two competing models.</p>
+
+    <div class="two">
+      <div class="mech tax">
+        <div class="ic">🏛️</div>
+        <h3 data-lang-es>Modelo de impuesto pigouviano</h3>
+        <h3 data-lang-en>Pigouvian tax model</h3>
+        <p data-lang-es>Grava el ahorro de la automatización para internalizar el daño que el desplazamiento causa sobre la demanda agregada. El Estado recauda y, en su caso, compensa.</p>
+        <p data-lang-en>It taxes the automation saving to internalize the harm displacement causes to aggregate demand. The State collects and, where applicable, compensates.</p>
+
+        <p class="vh" data-lang-es>Variables</p>
+        <p class="vh" data-lang-en>Variables</p>
+        <ul class="varlist" data-lang-es>
+          <li><b>τ</b> — tipo sobre el ahorro laboral (base 20%; zona de debate de política 10–30%).</li>
+          <li><b>N</b> — estructura competitiva (N = 1/HHI); fija la fracción del daño que la firma ignora, (1−1/N).</li>
+          <li><b>f</b> — intensidad de la externalidad de demanda (≈ 0,2–0,3).</li>
+          <li><b>i</b> — ineficiencia del canal fiscal (coste marginal de los fondos públicos).</li>
+          <li><b>α</b> — afectación de la recaudación a compensación (0–100%).</li>
+        </ul>
+        <ul class="varlist" data-lang-en>
+          <li><b>τ</b> — rate on the labour saving (base 20%; policy-debate zone 10–30%).</li>
+          <li><b>N</b> — competitive structure (N = 1/HHI); sets the share of harm the firm ignores, (1−1/N).</li>
+          <li><b>f</b> — intensity of the demand externality (≈ 0.2–0.3).</li>
+          <li><b>i</b> — inefficiency of the fiscal channel (marginal cost of public funds).</li>
+          <li><b>α</b> — earmarking of revenue to compensation (0–100%).</li>
+        </ul>
+
+        <p class="vh" data-lang-es>Tipo óptimo</p>
+        <p class="vh" data-lang-en>Optimal rate</p>
+        <span class="eq">τ* = f · (1 − 1/N)</span>
+
+        <p class="vh" data-lang-es>Procedimiento de aplicación</p>
+        <p class="vh" data-lang-en>Application procedure</p>
+        <p class="proc" data-lang-es>La firma que automatiza captura el ahorro de coste laboral; se aplica τ sobre ese ahorro; la recaudación se destina (según α) a compensar al trabajador desplazado mediante una transferencia temporal (D años), sujeta a su fiscalidad y a la tasa de cobro efectiva (take-up).</p>
+        <p class="proc" data-lang-en>The automating firm captures the labour-cost saving; τ is levied on that saving; revenue is earmarked (per α) to compensate the displaced worker through a temporary transfer (D years), subject to its taxation and to the effective take-up rate.</p>
+        <p class="proc" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:12px;font-size:.85rem" data-lang-es><em>Nota de base:</em> τ grava el <strong>ahorro laboral</strong> (un flujo), no el capital-robot. Por eso su rango de debate (10–30%) no es directamente comparable, sin normalizar la base, con el tipo óptimo de la literatura sobre robots —que grava el capital y se sitúa en ≈1–14% (Acemoglu-Manera-Restrepo; Guerreiro-Rebelo-Teles)—.</p>
+        <p class="proc" style="border-top:1px dashed var(--line);padding-top:10px;margin-top:12px;font-size:.85rem" data-lang-en><em>Base note:</em> τ taxes the <strong>labour saving</strong> (a flow), not robot capital. Its policy-debate range (10–30%) is therefore not directly comparable, without base-normalization, to the optimal robot-tax rate in the literature —which taxes capital and sits at ≈1–14% (Acemoglu-Manera-Restrepo; Guerreiro-Rebelo-Teles).</p>
+      </div>
+
+      <div class="mech roy">
+        <div class="ic">🎫</div>
+        <h3 data-lang-es>Modelo de royalties tokenizados</h3>
+        <h3 data-lang-en>Tokenized royalties model</h3>
+        <p data-lang-es>El trabajador cuyo capital intelectual queda incorporado a la IA conserva un derecho residual sobre el valor que esta genera, financiado por la empresa.</p>
+        <p data-lang-en>The worker whose intellectual capital is embedded in the AI retains a residual claim on the value it generates, financed by the firm.</p>
+
+        <p class="vh" data-lang-es>Variables</p>
+        <p class="vh" data-lang-en>Variables</p>
+        <ul class="varlist" data-lang-es>
+          <li><b>θ</b> — derecho residual, % sobre el valor V (base 5%; tramos por exposición ITEA/OAXI).</li>
+          <li><b>V = κ·wᴵ</b> — valor del activo algorítmico; κ, multiplicador sectorial (1–4).</li>
+          <li><b>Arquitectura acumulativa</b> — devenga por <em>vintages</em> anuales: paga cuando ocurre la transferencia de conocimiento, no en el despido.</li>
+          <li><b>δ</b> — decaimiento anual del vintage (base 15%).</li>
+          <li><b>Wallet</b> — tokens custodiados, depósito indexado al IPC y financiación interna, con garantía en insolvencia.</li>
+        </ul>
+        <ul class="varlist" data-lang-en>
+          <li><b>θ</b> — residual claim, % of value V (base 5%; bands by ITEA/OAXI exposure).</li>
+          <li><b>V = κ·wᴵ</b> — value of the algorithmic asset; κ, sectoral multiplier (1–4).</li>
+          <li><b>Cumulative architecture</b> — accrues by annual <em>vintages</em>: it pays when the knowledge transfer happens, not at layoff.</li>
+          <li><b>δ</b> — annual vintage decay (base 15%).</li>
+          <li><b>Wallet</b> — custodied tokens, CPI-indexed deposit and internal financing, guaranteed in insolvency.</li>
+        </ul>
+
+        <p class="vh" data-lang-es>Condición de participación</p>
+        <p class="vh" data-lang-en>Participation condition</p>
+        <span class="eq">θ ≥ τ · wᴵ · (1 − i) · α / V</span>
+        <p class="proc" data-lang-es>Es el suelo que hace el royalty preferible al impuesto vigente.</p>
+        <p class="proc" data-lang-en>This is the floor that makes the royalty preferable to the prevailing tax.</p>
+
+        <p class="vh" data-lang-es>Procedimiento de uso</p>
+        <p class="vh" data-lang-en>Procedure of use</p>
+        <p class="proc" data-lang-es>A lo largo de la vida laboral, cada año de transferencia de capital intelectual genera un vintage de derechos; los derechos se acumulan en una wallet tokenizada (indexada al IPC y garantizada en insolvencia); el trabajador percibe θ·V, y el saldo puede financiar internamente proyectos de la empresa.</p>
+        <p class="proc" data-lang-en>Throughout working life, each year of intellectual-capital transfer generates a vintage of claims; claims accrue in a tokenized wallet (CPI-indexed and insolvency-guaranteed); the worker receives θ·V, and the balance can internally finance the firm's projects.</p>
       </div>
     </div>
   </div>
@@ -217,6 +322,68 @@
         <figcaption data-lang-es>Efecto de la edad de desplazamiento sobre la frontera de optimalidad.</figcaption>
         <figcaption data-lang-en>Effect of displacement age on the optimality frontier.</figcaption>
       </figure>
+    </div>
+  </div>
+</section>
+
+<!-- DEEPER RESULTS v2.0 -->
+<section style="background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <p class="eyebrow" data-lang-es>Profundizando · v2.0</p>
+    <p class="eyebrow" data-lang-en>Going deeper · v2.0</p>
+    <h2 data-lang-es>Dos teoremas y una honestidad</h2>
+    <h2 data-lang-en>Two theorems and one honesty</h2>
+    <p class="sub" data-lang-es>La simulación, calibrada con microdatos de <strong>Forbes Global 2000</strong> (1.943 firmas: κ entre 1,3 en comercio y 2,2 en banca; N = 1/HHI por sector), eleva dos hallazgos a la categoría de teorema y obliga a una declaración honesta sobre quién paga.</p>
+    <p class="sub" data-lang-en>The simulation, calibrated with <strong>Forbes Global 2000</strong> microdata (1,943 firms: κ from 1.3 in retail to 2.2 in banking; N = 1/HHI by sector), raises two findings to the status of theorem and forces an honest statement about who pays.</p>
+
+    <div class="two">
+      <div class="mech roy">
+        <div class="ic">⏳</div>
+        <h3 data-lang-es>Proposición 2 — complementariedad por cohortes</h3>
+        <h3 data-lang-en>Proposition 2 — complementarity across cohorts</h3>
+        <p data-lang-es>El umbral de indiferencia θ* del trabajador depende de la edad <em>en sentido opuesto</em> según la arquitectura: con devengo acumulativo cae con la edad (el senior llega con la wallet llena); con devengo plano sube. El óptimo es un sistema de <strong>dos pisos</strong> — fiscal para los jóvenes, contractual para los seniors — con cruce en 48–52 años.</p>
+        <p data-lang-en>The worker's indifference threshold θ* depends on age <em>in opposite directions</em> by architecture: under cumulative accrual it falls with age (the senior arrives with a full wallet); under flat accrual it rises. The optimum is a <strong>two-tier</strong> system — fiscal for the young, contractual for seniors — crossing at ages 48–52.</p>
+        <table>
+          <thead>
+            <tr><th data-lang-es>Arquitectura</th><th data-lang-en>Architecture</th><th>45</th><th>50</th><th>55</th><th>60</th></tr>
+          </thead>
+          <tbody>
+            <tr><td data-lang-es>Acumulativa</td><td data-lang-en>Cumulative</td><td>7,6–8,9%</td><td>4,9–5,7%</td><td>3,5–4,1%</td><td>1,5–1,7%</td></tr>
+            <tr><td data-lang-es>Plana</td><td data-lang-en>Flat</td><td>4,3–5,0%</td><td>5,3–6,3%</td><td>7,5–8,8%</td><td>7,5–8,8%</td></tr>
+          </tbody>
+        </table>
+        <p class="proc" data-lang-es>θ* de indiferencia por edad de desplazamiento (9 países; τ=20%, i=35%).</p>
+        <p class="proc" data-lang-en>Indifference θ* by displacement age (9 countries; τ=20%, i=35%).</p>
+      </div>
+
+      <div class="mech tax">
+        <div class="ic">🤝</div>
+        <h3 data-lang-es>Proposición 3 — la zona de contratación</h3>
+        <h3 data-lang-en>Proposition 3 — the contracting zone</h3>
+        <p data-lang-es>Existe un intervalo de θ en el que <em>ambas partes</em> prefieren el royalty al impuesto. Y es la existencia del impuesto la que lo abre: el impuesto legislado actúa como <strong>amenaza creíble</strong> (el punto de desacuerdo de Nash) que hace racional la adopción voluntaria. Sin impuesto (τ=0), la zona colapsa y ninguna firma aceptaría θ&gt;0.</p>
+        <p data-lang-en>There is an interval of θ where <em>both parties</em> prefer the royalty to the tax. And it is the tax's existence that opens it: the legislated tax acts as a <strong>credible threat</strong> (the Nash disagreement point) that makes voluntary adoption rational. Without a tax (τ=0), the zone collapses and no firm would accept θ&gt;0.</p>
+        <table>
+          <thead>
+            <tr><th data-lang-es>Impuesto τ</th><th data-lang-en>Tax τ</th><th data-lang-es>Zona de contratación θ</th><th data-lang-en>Contracting zone θ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>10%</td><td>2,1–2,5%</td></tr>
+            <tr><td>20%</td><td>3,7–5,0%</td></tr>
+            <tr><td>30%</td><td>5,5–7,5%</td></tr>
+          </tbody>
+        </table>
+        <p class="proc" data-lang-es>La anchura de la zona crece con τ: un impuesto subsidiario más fuerte da más margen al acuerdo.</p>
+        <p class="proc" data-lang-en>The zone widens with τ: a stronger backstop tax leaves more room to agree.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;background:var(--green-soft);border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px">
+      <p class="vh" style="color:var(--green-dark);margin-top:0" data-lang-es>Sin almuerzo gratis: un seguro, no un regalo</p>
+      <p class="vh" style="color:var(--green-dark);margin-top:0" data-lang-en>No free lunch: insurance, not a gift</p>
+      <p style="margin:0 0 10px;color:var(--ink);font-size:.95rem" data-lang-es>A coste anual casi idéntico, el valor presente del coste empresarial del royalty <strong>duplica</strong> al del impuesto (≈152.700 € frente a 76.700 € por trabajador) — exclusivamente porque la empresa paga antes. Eso no es un regalo al trabajador: es la definición de un <strong>seguro</strong>. La dominancia es de sincronización y de eliminación del peso muerto fiscal, no de coste total.</p>
+      <p style="margin:0 0 10px;color:var(--ink);font-size:.95rem" data-lang-en>At nearly identical annual cost, the present value of the firm's royalty cost <strong>doubles</strong> that of the tax (≈€152,700 vs €76,700 per worker) — solely because the firm pays earlier. That is not a gift to the worker: it is the definition of <strong>insurance</strong>. The dominance is one of synchronization and of eliminating fiscal deadweight, not of total cost.</p>
+      <p style="margin:0;color:var(--muted);font-size:.92rem" data-lang-es><strong>Límite honesto — el canal de pensiones:</strong> el despido a los 55 erosiona ~20% de la base reguladora (≈90.000 € en valor presente) que <em>ningún</em> mecanismo repara. La extensión natural: destinar parte de la wallet a un convenio especial con la Seguridad Social.</p>
+      <p style="margin:0;color:var(--muted);font-size:.92rem" data-lang-en><strong>An honest limit — the pension channel:</strong> displacement at 55 erodes ~20% of the pension base (≈€90,000 in present value) that <em>no</em> mechanism repairs. The natural extension: allocate part of the wallet to a special social-security agreement.</p>
     </div>
   </div>
 </section>
@@ -300,7 +467,11 @@
     <h2 data-lang-es>Cita y licencia</h2>
     <h2 data-lang-en>Citation and license</h2>
     <div class="box">
-      García-Lluis Valencia, A. (2026). <em>Pigouvian Tax vs Royalties Token: a comparative simulator of compensation mechanisms for agentic-AI displacement</em> (v1.0). ITEA Framework.
+      <span data-lang-es>García-Lluis Valencia, A. (2026). <em>Más allá de la trampa pigouviana: capital intelectual tokenizado como mecanismo Pareto-dominante de la externalidad de despido bajo IA agéntica</em> (Paper 8B). Marco ITEA.</span>
+      <span data-lang-en>García-Lluis Valencia, A. (2026). <em>Beyond the Pigouvian Trap: Tokenized Intellectual Capital as a Pareto-Dominant Mechanism for the Agentic-AI Layoff Externality</em> (Paper 8B). ITEA Framework.</span>
+      <br/><br/>
+      <span style="font-size:.88rem;opacity:.85" data-lang-es>Simulador: García-Lluis Valencia, A. (2026). <em>Pigouvian Tax vs Royalties Token: simulador comparado de mecanismos de compensación frente al desplazamiento por IA agéntica</em> (v1.0). Marco ITEA.</span>
+      <span style="font-size:.88rem;opacity:.85" data-lang-en>Simulator: García-Lluis Valencia, A. (2026). <em>Pigouvian Tax vs Royalties Token: a comparative simulator of compensation mechanisms for agentic-AI displacement</em> (v1.0). ITEA Framework.</span>
     </div>
     <p class="lic" data-lang-es><strong>Licencia propietaria — uso no comercial.</strong> Propiedad intelectual de Alberto García-Lluis Valencia. Uso académico, docente e investigador permitido con atribución. <strong>Todo uso comercial requiere autorización escrita del autor</strong>; el uso comercial no autorizado conlleva una indemnización del 40% de la facturación obtenida. Véase la <a href="https://github.com/Aval22/Pigouvian_Tax_vs_Royalties_Token/blob/main/LICENSE">licencia completa</a>.</p>
     <p class="lic" data-lang-en><strong>Proprietary license — non-commercial use.</strong> Intellectual property of Alberto García-Lluis Valencia. Academic, teaching and research use permitted with attribution. <strong>Any commercial use requires the author's written authorization</strong>; unauthorized commercial use carries a 40% revenue indemnification. See the <a href="https://github.com/Aval22/Pigouvian_Tax_vs_Royalties_Token/blob/main/LICENSE">full license</a>.</p>
